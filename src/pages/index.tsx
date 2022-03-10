@@ -27,7 +27,7 @@ const Room: NextPage = () => {
 
   return (
     <div className={styles.main}>
-      <h1 className={styles.title}>Matches</h1>
+      <h1 className={styles.title}>Match My Sheets</h1>
       {
         /*user &&*/ <MatchesConfigComponent
           showConfig={!!showConfig}
@@ -50,8 +50,19 @@ const Room: NextPage = () => {
           <p>{user?.email}</p>
         </>
       )} */}
+      <a
+        className="underline hover:text-blue-500 mt-4"
+        href={`${process.env.NEXT_PUBLIC_SUPPORT_URL}`}
+        target="_blank"
+        rel="noreferrer noopener"
+      >
+        Support
+      </a>
     </div>
   );
 };
 
 export default Room;
+
+// Uncomment to forbid access to index page for anon users.
+//export const getServerSideProps = withAuthRequired({ redirectTo: '/login' });
