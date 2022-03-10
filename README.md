@@ -30,3 +30,11 @@ $ yarn dev
 2. Use this [url](https://sheets-matcher-ui.vercel.app/?config=true&connect=true&chatid=true) for app.
 3. Set your group chat id in text field (could be found at [web.telegram.org](https://web.telegram.org)).
 4. Click Connect to make bot send a message to chat with contacts of people matched.
+
+### Setup from scratch
+
+1. Create users for github (sources, auth), vercel (deploy), gcp (sheets API), airtable (API), discord (auth), supabase (db, auth). Set up 2fa.
+2. Create new app in Github, Discord. Get OAuth client id / secret.
+3. Setup auth in supabase. Create db, turn on RLS, add default policies.
+4. Fork this repo for your github user.
+5. Connect vercel to your repo. Add env variables. Deploy.
