@@ -1,0 +1,27 @@
+create table public.match_requests (
+   id serial,
+   slug varchar,
+   author uuid,
+   request_spreadsheet_id varchar,
+   request_sheet_id varchar,
+   proposal_spreadsheet_id varchar,
+   proposal_sheet_id varchar,
+   props_to_be_equal varchar,
+   props_to_be_greater varchar,
+   props_to_have_common_words varchar,
+   props_to_ignore varchar,
+   props_to_filter varchar,
+   values_to_filter varchar,
+   request_ids_to_filter varchar,
+   proposal_ids_to_filter varchar,
+   chat_id varchar,
+   columns_send_to_chat varchar,
+   match_type varchar,
+   source_type varchar,
+   messenger varchar,
+   is_private boolean,
+   
+   created_at timestamp with time zone default now(),
+   primary key (id),
+   unique (slug)
+)
