@@ -18,12 +18,13 @@ export interface MatchRequest {
   propsToIgnore?: string;
   propsToFilter?: string;
   valuesToFilter?: string;
-  requestIdsToFilter?: number[];
-  proposalIdsToFilter?: number[];
+  requestIdsToFilter?: (string | number)[];
+  proposalIdsToFilter?: (string | number)[];
   chatId?: string;
   columnsSendToChat?: string;
   messenger?: MessengerTypes;
   isPrivate?: boolean;
+  showUrls?: boolean;
 }
 
 export type MatchRequestSnake = CamelCaseToSnakeNested<MatchRequest>;
@@ -43,8 +44,10 @@ export const isValid = (matchRequest: MatchRequest): boolean =>
   matchRequest.proposalSheetId?.length > 0;
 
 export interface Match {
-  requestId: number;
-  proposalIds: number[];
+  requestId: string | number;
+  proposalIds: string[] | number[];
+  requestUrl?: string;
+  proposalUrls?: string[];
 }
 
 export const proposalIdsToString = (match: Match) => match.proposalIds.join(',');

@@ -77,6 +77,7 @@ const MatchesConfigComponent = ({
       chatId,
       messenger,
       columnsSendToChat,
+      showUrls: true,
     });
   }, [
     requestSpreadsheetId,

@@ -1,6 +1,6 @@
 import { MatchRequest } from './types';
 
-const DEFAULT_PROPS_TO_IGNORE = ['rowNumber'];
+const DEFAULT_PROPS_TO_IGNORE = ['rowNumber', 'sheetTitle', 'sheetId', 'rowUrl'];
 
 const haveCommonWords = (request: string, proposal: string): boolean => {
   // TODO: Use single regex, figure out unicode matching
@@ -67,26 +67,26 @@ const getGenericMatchFuncs = (matchRequest: MatchRequest) => {
     !matchRequest.propsToBeEqual && !matchRequest.propsToBeGreater
       ? (request: any, proposal: any) => genericMatchAllPropsEqual(request, proposal, propsToIgnore)
       : (request: any, proposal: any) =>
-          genericMatch(
-            request,
-            proposal,
-            matchRequest.propsToHaveCommonWords?.split(',').filter(Boolean) ?? [],
-            !matchRequest.propsToBeEqual
-              ? Object.keys(request)
-              : matchRequest.propsToBeEqual?.split(',').filter(Boolean),
-            matchRequest.propsToBeGreater?.split(',').filter(Boolean) ?? [],
-            propsToIgnore
-          );
+        genericMatch(
+          request,
+          proposal,
+          matchRequest.propsToHaveCommonWords?.split(',').filter(Boolean) ?? [],
+          !matchRequest.propsToBeEqual
+            ? Object.keys(request)
+            : matchRequest.propsToBeEqual?.split(',').filter(Boolean),
+          matchRequest.propsToBeGreater?.split(',').filter(Boolean) ?? [],
+          propsToIgnore
+        );
 
   const filterFunc =
     !matchRequest.propsToFilter && !matchRequest.valuesToFilter
       ? (request: any) => true
       : (request: any) =>
-          genericFilter(
-            request,
-            matchRequest.propsToFilter?.split(',') ?? [], //['status'],
-            matchRequest.valuesToFilter?.split(';')?.map((v) => v?.split(',')) ?? [[]] //['new']
-          );
+        genericFilter(
+          request,
+          matchRequest.propsToFilter?.split(',') ?? [], //['status'],
+          matchRequest.valuesToFilter?.split(';')?.map((v) => v?.split(',')) ?? [[]] //['new']
+        );
 
   // TODO: Brittle.
   const id = (request: any) => {

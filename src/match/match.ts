@@ -14,11 +14,13 @@ export const getMatches = async (matchRequest: MatchRequest): Promise<Match[]> =
   const proposals = (await getProposals(matchRequest, mapRowToProposal)).filter(filterProposals);
 
   const matches: Match[] = requests
-    .map((request) => ({
+    .map((request) => ({ request, macthedProposals: proposals.filter((proposal) => match(request, proposal)) }))
+    .map(({ request, macthedProposals }) => ({
       requestId: `${request.sheetTitle ? request.sheetTitle + ": " : ''}${request.rowNumber}`,
-      proposalIds: proposals
-        .filter((proposal) => match(request, proposal))
+      proposalIds: macthedProposals
         .map((proposal) => `${proposal.sheetTitle ? proposal.sheetTitle + ": " : ''}${proposal.rowNumber}`),
+      requestUrl: matchRequest.showUrls ? request.rowUrl : undefined,
+      proposalUrls: matchRequest.showUrls ? macthedProposals.map((proposal) => proposal.rowUrl) : undefined
     }))
     .filter((match) => match.proposalIds.length > 0);
 
