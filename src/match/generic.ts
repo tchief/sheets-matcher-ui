@@ -61,7 +61,7 @@ const genericFilter = (
 const getGenericMatchFuncs = (matchRequest: MatchRequest) => {
   const propsToIgnore = [
     ...DEFAULT_PROPS_TO_IGNORE,
-    ...(matchRequest.propsToIgnore?.split(',').filter(Boolean) ?? []),
+    ...(matchRequest.propsToIgnore?.split(',').filter(Boolean).map(p => p.toLowerCase()) ?? []),
   ];
   const matchFunc =
     !matchRequest.propsToBeEqual && !matchRequest.propsToBeGreater
@@ -70,11 +70,11 @@ const getGenericMatchFuncs = (matchRequest: MatchRequest) => {
         genericMatch(
           request,
           proposal,
-          matchRequest.propsToHaveCommonWords?.split(',').filter(Boolean) ?? [],
+          matchRequest.propsToHaveCommonWords?.split(',').filter(Boolean).map(p => p.toLowerCase()) ?? [],
           !matchRequest.propsToBeEqual
-            ? Object.keys(request)
-            : matchRequest.propsToBeEqual?.split(',').filter(Boolean),
-          matchRequest.propsToBeGreater?.split(',').filter(Boolean) ?? [],
+            ? Object.keys(request).map(p => p.toLowerCase())
+            : matchRequest.propsToBeEqual?.split(',').filter(Boolean).map(p => p.toLowerCase()),
+          matchRequest.propsToBeGreater?.split(',').filter(Boolean).map(p => p.toLowerCase()) ?? [],
           propsToIgnore
         );
 
@@ -84,7 +84,7 @@ const getGenericMatchFuncs = (matchRequest: MatchRequest) => {
       : (request: any) =>
         genericFilter(
           request,
-          matchRequest.propsToFilter?.split(',') ?? [], //['status'],
+          matchRequest.propsToFilter?.split(',').filter(Boolean).map(p => p.toLowerCase()) ?? [], //['status'],
           matchRequest.valuesToFilter?.split(';')?.map((v) => v?.split(',')) ?? [[]] //['new']
         );
 
@@ -92,8 +92,8 @@ const getGenericMatchFuncs = (matchRequest: MatchRequest) => {
   const id = (request: any) => {
     const { _sheet, _rowNumber, _rawData, _rawJson, _table, ...props } = request;
     return props.fields && _rawJson // Brittle, airtable detection.
-      ? { ...props.fields, rowNumber: request.rowNumber ?? request.id }
-      : { ...props, rowNumber: request.rowNumber ?? request.id };
+      ? { ...toLowerKeys(props.fields), rowNumber: request.rowNumber ?? request.id }
+      : { ...toLowerKeys(props), rowNumber: request.rowNumber ?? request.id };
   };
 
   return {
@@ -104,5 +104,10 @@ const getGenericMatchFuncs = (matchRequest: MatchRequest) => {
     mapRowToProposal: id,
   };
 };
+
+const toLowerKeys = (obj: any) => Object.fromEntries(
+  Object.entries(obj).map(([k, v]) => [k.toLowerCase(), v])
+);
+
 
 export default getGenericMatchFuncs;
