@@ -31,10 +31,10 @@ const getRows = async (
   const viewIds = VIEW_ID.split(',');
 
   const allRows = await Promise.all(baseIds.map(async (baseId, index) => {
-    const base = new Airtable({ apiKey: AIRTABLE_API_KEY }).base(baseId);
+    const base = new Airtable({ apiKey: AIRTABLE_API_KEY }).base(baseId.trim());
     const rows: any[] = [];
 
-    await base(viewIds[index])
+    await base(viewIds[index].trim())
       // TODO: Pass fields from matchRequest to retieve, not all of them
       // TODO: Pass view as param, or default view: 'Matcher', sort: [{ field: 'ID', direction: 'desc' }]
       // TODO: Max records as param
