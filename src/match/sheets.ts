@@ -1,5 +1,5 @@
 import { GoogleSpreadsheet, GoogleSpreadsheetRow } from 'google-spreadsheet';
-import { Match, proposalIdsToString, MatchRequest } from './types';
+import { Match, proposalIdsToString, MatchRequest, split } from './types';
 
 const CLIENT_EMAIL = process.env.GOOGLE_SHEETS_CLIENT_EMAIL!;
 const PRIVATE_KEY = process.env.GOOGLE_SHEETS_PRIVATE_KEY!.replace(/\\n/g, '\n');
@@ -41,8 +41,9 @@ const getRows = async (
   SHEET_ID: string,
   ids: number[] = []
 ) => {
-  const baseIds = SPREADSHEET_ID.split(',').map(id => id.trim());
-  const viewIds = SHEET_ID.split(',').map(id => id.trim());
+  const { sheetsBases, sheetsTables } = split(SPREADSHEET_ID, SHEET_ID);
+  const baseIds = sheetsBases.split(',').map(id => id.trim());
+  const viewIds = sheetsTables.split(',').map(id => id.trim());
 
   const allRows = await Promise.all(baseIds.map(async (baseId, index) => {
     const doc = new GoogleSpreadsheet(baseId);

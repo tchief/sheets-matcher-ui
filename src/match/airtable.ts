@@ -1,4 +1,4 @@
-import { MatchRequest } from './types';
+import { MatchRequest, split } from './types';
 import Airtable from 'airtable';
 
 const AIRTABLE_API_KEY = process.env.AIRTABLE_API_KEY!;
@@ -27,8 +27,9 @@ const getRows = async (
   VIEW_ID: string,
   ids: number[] = []
 ) => {
-  const baseIds = BASE_ID.split(',').map(id => id.trim());
-  const viewIds = VIEW_ID.split(',').map(id => id.trim());
+  const { airtableBases, airtableTables } = split(BASE_ID, VIEW_ID);
+  const baseIds = airtableBases.split(',').map(id => id.trim());
+  const viewIds = airtableTables.split(',').map(id => id.trim());
 
   const allRows = await Promise.all(baseIds.map(async (baseId, index) => {
     const base = new Airtable({ apiKey: AIRTABLE_API_KEY }).base(baseId);
