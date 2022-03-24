@@ -41,17 +41,17 @@ const getRows = async (
   SHEET_ID: string,
   ids: number[] = []
 ) => {
-  const baseIds = SPREADSHEET_ID.split(',');
-  const viewIds = SHEET_ID.split(',');
+  const baseIds = SPREADSHEET_ID.split(',').map(id => id.trim());
+  const viewIds = SHEET_ID.split(',').map(id => id.trim());
 
   const allRows = await Promise.all(baseIds.map(async (baseId, index) => {
-    const doc = new GoogleSpreadsheet(baseId.trim());
+    const doc = new GoogleSpreadsheet(baseId);
     await doc.useServiceAccountAuth({
       client_email: CLIENT_EMAIL,
       private_key: PRIVATE_KEY,
     });
     await doc.loadInfo();
-    const sheetTitle = viewIds[index].trim();
+    const sheetTitle = viewIds[index];
     const sheet = doc.sheetsByTitle[sheetTitle];
     const sheetId = sheet.sheetId;
     const getRowUrl = (r: GoogleSpreadsheetRow) => `https://docs.google.com/spreadsheets/d/${baseId}/edit#gid=${sheetId}&range=${r.rowIndex}:${r.rowIndex}`;

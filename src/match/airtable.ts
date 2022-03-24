@@ -27,14 +27,15 @@ const getRows = async (
   VIEW_ID: string,
   ids: number[] = []
 ) => {
-  const baseIds = BASE_ID.split(',');
-  const viewIds = VIEW_ID.split(',');
+  const baseIds = BASE_ID.split(',').map(id => id.trim());
+  const viewIds = VIEW_ID.split(',').map(id => id.trim());
 
   const allRows = await Promise.all(baseIds.map(async (baseId, index) => {
-    const base = new Airtable({ apiKey: AIRTABLE_API_KEY }).base(baseId.trim());
+    const base = new Airtable({ apiKey: AIRTABLE_API_KEY }).base(baseId);
+    const table = viewIds[index];
     const rows: any[] = [];
 
-    await base(viewIds[index].trim())
+    await base(table)
       // TODO: Pass fields from matchRequest to retieve, not all of them
       // TODO: Pass view as param, or default view: 'Matcher', sort: [{ field: 'ID', direction: 'desc' }]
       // TODO: Max records as param
@@ -43,12 +44,18 @@ const getRows = async (
         rows.push(...fetchedRecords);
         fetchNextPage();
       });
+    const getRowUrl = (r: any) => `https://airtable.com/${baseId}/${table}/${r.id}`;
 
     // TODO: Unify id / rowIndex props.
     const filteredRows = ids?.length
       ? rows.filter((row) => ids.includes(row.rowIndex ?? row.id))
       : rows;
-    return filteredRows?.map(mapRow);
+
+    return filteredRows?.map(r => ({
+      ...mapRow(r),
+      sheetTitle: viewIds.length > 1 && !table.toString().startsWith("tbl") ? table : undefined,
+      rowUrl: table.toString().startsWith("tbl") ? getRowUrl(r) : undefined
+    }))
   }));
 
   return allRows.flat();
