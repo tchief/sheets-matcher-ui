@@ -12,7 +12,7 @@ export const getRequests = (matchRequest: MatchRequest, mapRowToRequest: (row: a
     PRIVATE_KEY,
     matchRequest.requestSpreadsheetId,
     matchRequest.requestSheetId,
-    matchRequest.requestIdsToFilter
+    matchRequest.requestIdsToFilter?.map((r) => +r)
   );
 export const getProposals = (matchRequest: MatchRequest, mapRowToProposal: (row: any) => any) =>
   getRows(
@@ -21,7 +21,7 @@ export const getProposals = (matchRequest: MatchRequest, mapRowToProposal: (row:
     PRIVATE_KEY,
     matchRequest.proposalSpreadsheetId,
     matchRequest.proposalSheetId,
-    matchRequest.proposalIdsToFilter
+    matchRequest.proposalIdsToFilter?.map((r) => +r)
   );
 export const saveMatchesToRequestSheet = (matchRequest: MatchRequest, matches: Match[]) =>
   saveMatches(
@@ -41,16 +41,27 @@ const getRows = async (
   SHEET_ID: string,
   ids: number[] = []
 ) => {
-  const doc = new GoogleSpreadsheet(SPREADSHEET_ID);
-  await doc.useServiceAccountAuth({
-    client_email: CLIENT_EMAIL,
-    private_key: PRIVATE_KEY,
-  });
-  await doc.loadInfo();
-  const sheet = doc.sheetsByTitle[SHEET_ID];
-  const rows = await sheet.getRows();
-  const filteredRows = ids?.length ? rows.filter((row) => ids.includes(row.rowIndex)) : rows;
-  return filteredRows?.map(mapRow);
+  const baseIds = SPREADSHEET_ID.split(',');
+  const viewIds = SHEET_ID.split(',');
+
+  const allRows = await Promise.all(baseIds.map(async (baseId, index) => {
+    const doc = new GoogleSpreadsheet(baseId);
+    await doc.useServiceAccountAuth({
+      client_email: CLIENT_EMAIL,
+      private_key: PRIVATE_KEY,
+    });
+    await doc.loadInfo();
+    const sheetTitle = viewIds[index];
+    const sheet = doc.sheetsByTitle[sheetTitle];
+    const sheetId = sheet.sheetId;
+
+    const rows = await sheet.getRows();
+    const filteredRows = ids?.length ? rows.filter((row) => ids.includes(row.rowIndex)) : rows;
+
+    return viewIds.length > 1 ? filteredRows?.map(r => ({ ...mapRow(r), sheetTitle, sheetId })) : filteredRows?.map(mapRow);
+  }));
+
+  return allRows.flat();
 };
 
 const saveMatches = async (
@@ -68,7 +79,7 @@ const saveMatches = async (
   });
   await doc.loadInfo();
   const sheet = doc.sheetsByTitle[SHEET_ID];
-  const maxRowNumber = Math.max(...matches.map((m) => m.requestId));
+  const maxRowNumber = Math.max(...matches.map((m) => +m.requestId));
   await sheet.loadCells(`${column}1:${column}${maxRowNumber}`);
   matches.forEach(
     (match) => (sheet.getCellByA1(`${column}${match.requestId}`).value = proposalIdsToString(match))

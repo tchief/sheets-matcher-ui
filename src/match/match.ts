@@ -15,10 +15,10 @@ export const getMatches = async (matchRequest: MatchRequest): Promise<Match[]> =
 
   const matches: Match[] = requests
     .map((request) => ({
-      requestId: request.rowNumber,
+      requestId: `${request.sheetTitle ? request.sheetTitle + ": " : ''}${request.rowNumber}`,
       proposalIds: proposals
         .filter((proposal) => match(request, proposal))
-        .map((proposal) => proposal.rowNumber),
+        .map((proposal) => `${proposal.sheetTitle ? proposal.sheetTitle + ": " : ''}${proposal.rowNumber}`),
     }))
     .filter((match) => match.proposalIds.length > 0);
 
