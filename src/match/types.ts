@@ -46,8 +46,8 @@ export const isValid = (matchRequest: MatchRequest): boolean =>
 export interface Match {
   requestId: string | number;
   proposalIds: string[] | number[];
-  requestUrl?: string;
-  proposalUrls?: string[];
+  requestUrl?: string | null;
+  proposalUrls?: string[] | null;
 }
 
 export const proposalIdsToString = (match: Match) => match.proposalIds.join(',');

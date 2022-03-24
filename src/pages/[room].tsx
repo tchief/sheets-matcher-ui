@@ -3,13 +3,25 @@ import { Match, MatchRequest } from '../match/types';
 import { loadMatchRequest, supabase } from '../utils/supabase';
 import styles from '../styles/Home.module.css';
 import MatchesTable from '../components/matches';
+import Layout from '../components/layout';
+import { toTitle } from '../utils/utils';
 
-function MatchPage({ matchRequest, matches }: { matchRequest: MatchRequest; matches: Match[] }) {
+function MatchPage({
+  room,
+  matchRequest,
+  matches,
+}: {
+  room: string;
+  matchRequest: MatchRequest;
+  matches: Match[];
+}) {
   return (
-    <div className={styles.main}>
-      <h1 className={styles.title}>Matches</h1>
-      <MatchesTable matches={matches} matchRequest={matchRequest} showConnect={false} />
-    </div>
+    <Layout title={toTitle(room)}>
+      <div className={styles.main}>
+        <h1 className={styles.title}>Matches</h1>
+        <MatchesTable matches={matches} matchRequest={matchRequest} showConnect={false} />
+      </div>
+    </Layout>
   );
 }
 
@@ -33,7 +45,7 @@ export const getServerSideProps = async (context: { query: { room: any }; req: a
 
   try {
     const matches = await getMatches(matchRequest);
-    return { props: { matchRequest, matches } };
+    return { props: { room, matchRequest, matches } };
   } catch (error) {
     return {
       notFound: true,

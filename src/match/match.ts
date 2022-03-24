@@ -19,8 +19,8 @@ export const getMatches = async (matchRequest: MatchRequest): Promise<Match[]> =
       requestId: `${request.sheetTitle ? request.sheetTitle + ": " : ''}${request.rowNumber}`,
       proposalIds: macthedProposals
         .map((proposal) => `${proposal.sheetTitle ? proposal.sheetTitle + ": " : ''}${proposal.rowNumber}`),
-      requestUrl: matchRequest.showUrls ? request.rowUrl : undefined,
-      proposalUrls: matchRequest.showUrls ? macthedProposals.map((proposal) => proposal.rowUrl) : undefined
+      requestUrl: matchRequest.showUrls ? request.rowUrl : null,
+      proposalUrls: matchRequest.showUrls ? macthedProposals.map((proposal) => proposal.rowUrl) : null
     }))
     .filter((match) => match.proposalIds.length > 0);
 
