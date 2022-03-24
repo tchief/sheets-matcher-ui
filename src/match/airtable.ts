@@ -25,7 +25,7 @@ const getRows = async (
   AIRTABLE_API_KEY: string,
   BASE_ID: string,
   VIEW_ID: string,
-  ids: number[] = []
+  ids: (number | string)[] = []
 ) => {
   const { airtableBases, airtableTables } = split(BASE_ID, VIEW_ID);
   const baseIds = airtableBases.split(',').map(id => id.trim());
