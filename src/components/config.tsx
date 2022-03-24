@@ -200,6 +200,9 @@ const MatchesConfigComponent = ({
         <Select.Option value="airtable">
           Airtable (please, create a view named Matcher)
         </Select.Option>
+        <Select.Option value="mixed">
+          Sheets and Airtable (please, create a view named Matcher)
+        </Select.Option>
       </Select>
     </Tabs.Panel>
   );
