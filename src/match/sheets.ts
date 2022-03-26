@@ -1,5 +1,5 @@
-import { GoogleSpreadsheet } from 'google-spreadsheet';
-import { Match, proposalIdsToString, MatchRequest } from './types';
+import { GoogleSpreadsheet, GoogleSpreadsheetRow } from 'google-spreadsheet';
+import { Match, proposalIdsToString, MatchRequest, split } from './types';
 
 const CLIENT_EMAIL = process.env.GOOGLE_SHEETS_CLIENT_EMAIL!;
 const PRIVATE_KEY = process.env.GOOGLE_SHEETS_PRIVATE_KEY!.replace(/\\n/g, '\n');
@@ -12,7 +12,7 @@ export const getRequests = (matchRequest: MatchRequest, mapRowToRequest: (row: a
     PRIVATE_KEY,
     matchRequest.requestSpreadsheetId,
     matchRequest.requestSheetId,
-    matchRequest.requestIdsToFilter
+    matchRequest.requestIdsToFilter?.map((r) => +r)
   );
 export const getProposals = (matchRequest: MatchRequest, mapRowToProposal: (row: any) => any) =>
   getRows(
@@ -21,7 +21,7 @@ export const getProposals = (matchRequest: MatchRequest, mapRowToProposal: (row:
     PRIVATE_KEY,
     matchRequest.proposalSpreadsheetId,
     matchRequest.proposalSheetId,
-    matchRequest.proposalIdsToFilter
+    matchRequest.proposalIdsToFilter?.map((r) => +r)
   );
 export const saveMatchesToRequestSheet = (matchRequest: MatchRequest, matches: Match[]) =>
   saveMatches(
@@ -41,16 +41,29 @@ const getRows = async (
   SHEET_ID: string,
   ids: number[] = []
 ) => {
-  const doc = new GoogleSpreadsheet(SPREADSHEET_ID);
-  await doc.useServiceAccountAuth({
-    client_email: CLIENT_EMAIL,
-    private_key: PRIVATE_KEY,
-  });
-  await doc.loadInfo();
-  const sheet = doc.sheetsByTitle[SHEET_ID];
-  const rows = await sheet.getRows();
-  const filteredRows = ids?.length ? rows.filter((row) => ids.includes(row.rowIndex)) : rows;
-  return filteredRows?.map(mapRow);
+  const { sheetsBases, sheetsTables } = split(SPREADSHEET_ID, SHEET_ID);
+  const baseIds = sheetsBases.split(',').map(id => id.trim());
+  const viewIds = sheetsTables.split(',').map(id => id.trim());
+
+  const allRows = await Promise.all(baseIds.map(async (baseId, index) => {
+    const doc = new GoogleSpreadsheet(baseId);
+    await doc.useServiceAccountAuth({
+      client_email: CLIENT_EMAIL,
+      private_key: PRIVATE_KEY,
+    });
+    await doc.loadInfo();
+    const sheetTitle = viewIds[index];
+    const sheet = doc.sheetsByTitle[sheetTitle];
+    const sheetId = sheet.sheetId;
+    const getRowUrl = (r: GoogleSpreadsheetRow) => `https://docs.google.com/spreadsheets/d/${baseId}/edit#gid=${sheetId}&range=${r.rowIndex}:${r.rowIndex}`;
+
+    const rows = await sheet.getRows();
+    const filteredRows = ids?.length ? rows.filter((row) => ids.includes(row.rowIndex)) : rows;
+
+    return filteredRows?.map(r => ({ ...mapRow(r), sheetTitle: viewIds.length > 1 ? sheetTitle : undefined, sheetId, rowUrl: getRowUrl(r) }))
+  }));
+
+  return allRows.flat();
 };
 
 const saveMatches = async (
@@ -68,7 +81,7 @@ const saveMatches = async (
   });
   await doc.loadInfo();
   const sheet = doc.sheetsByTitle[SHEET_ID];
-  const maxRowNumber = Math.max(...matches.map((m) => m.requestId));
+  const maxRowNumber = Math.max(...matches.map((m) => +m.requestId));
   await sheet.loadCells(`${column}1:${column}${maxRowNumber}`);
   matches.forEach(
     (match) => (sheet.getCellByA1(`${column}${match.requestId}`).value = proposalIdsToString(match))

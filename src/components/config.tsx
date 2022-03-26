@@ -77,6 +77,7 @@ const MatchesConfigComponent = ({
       chatId,
       messenger,
       columnsSendToChat,
+      showUrls: true,
     });
   }, [
     requestSpreadsheetId,
@@ -198,6 +199,9 @@ const MatchesConfigComponent = ({
         <Select.Option value="sheets">Google sheets</Select.Option>
         <Select.Option value="airtable">
           Airtable (please, create a view named Matcher)
+        </Select.Option>
+        <Select.Option value="mixed">
+          Sheets and Airtable (please, create a view named Matcher)
         </Select.Option>
       </Select>
     </Tabs.Panel>

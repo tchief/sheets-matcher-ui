@@ -6,6 +6,7 @@ import styles from '../styles/Home.module.css';
 import MatchesTable from '../components/matches';
 import MatchesConfigComponent from '../components/config';
 import { useUser } from '@supabase/supabase-auth-helpers/react';
+import Layout from '../components/layout';
 
 const Room: NextPage = () => {
   const { user } = useUser();
@@ -26,32 +27,45 @@ const Room: NextPage = () => {
   } = router.query || {};
 
   return (
-    <div className={styles.main}>
-      <h1 className={styles.title}>Matches</h1>
-      {
-        /*user &&*/ <MatchesConfigComponent
-          showConfig={!!showConfig}
-          showChatId={!!showChatId && !!user}
-          showSaveConfig={!!user}
+    <Layout>
+      <div className={styles.main}>
+        <h1 className={styles.title}>Match My Sheets</h1>
+        {
+          /*user &&*/ <MatchesConfigComponent
+            showConfig={!!showConfig}
+            showChatId={!!showChatId && !!user}
+            showSaveConfig={!!user}
+            matches={matches}
+            setMatches={setMatches}
+            matchRequest={matchRequest}
+            setMatchRequest={setMatchRequest}
+          />
+        }
+        <MatchesTable
           matches={matches}
-          setMatches={setMatches}
           matchRequest={matchRequest}
-          setMatchRequest={setMatchRequest}
+          showConnect={!!showConnect && !!user}
         />
-      }
-      <MatchesTable
-        matches={matches}
-        matchRequest={matchRequest}
-        showConnect={!!showConnect && !!user}
-      />
-      {/* {user && (
+        {/* {user && (
         <>
           <button onClick={() => supabaseClient.auth.signOut()}>Sign out</button>
           <p>{user?.email}</p>
         </>
       )} */}
-    </div>
+        <a
+          className="underline hover:text-blue-500 mt-4"
+          href={`${process.env.NEXT_PUBLIC_SUPPORT_URL}`}
+          target="_blank"
+          rel="noreferrer noopener"
+        >
+          Support
+        </a>
+      </div>
+    </Layout>
   );
 };
 
 export default Room;
+
+// Uncomment to forbid access to index page for anon users.
+//export const getServerSideProps = withAuthRequired({ redirectTo: '/login' });

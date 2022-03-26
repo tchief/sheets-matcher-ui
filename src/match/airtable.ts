@@ -1,4 +1,4 @@
-import { MatchRequest } from './types';
+import { MatchRequest, split } from './types';
 import Airtable from 'airtable';
 
 const AIRTABLE_API_KEY = process.env.AIRTABLE_API_KEY!;
@@ -25,25 +25,41 @@ const getRows = async (
   AIRTABLE_API_KEY: string,
   BASE_ID: string,
   VIEW_ID: string,
-  ids: number[] = []
+  ids: (number | string)[] = []
 ) => {
-  const base = new Airtable({ apiKey: AIRTABLE_API_KEY }).base(BASE_ID);
-  const rows: any[] = [];
-  await base(VIEW_ID)
-    // TODO: Pass fields from matchRequest to retieve, not all of them
-    // TODO: Pass view as param, or default view: 'Matcher', sort: [{ field: 'ID', direction: 'desc' }]
-    // TODO: Max records as param
-    .select({ view: 'Matcher', maxRecords: 1000 })
-    .eachPage(function page(fetchedRecords, fetchNextPage) {
-      rows.push(...fetchedRecords);
-      fetchNextPage();
-    });
+  const { airtableBases, airtableTables } = split(BASE_ID, VIEW_ID);
+  const baseIds = airtableBases.split(',').map(id => id.trim());
+  const viewIds = airtableTables.split(',').map(id => id.trim());
 
-  // TODO: Unify id / rowIndex props.
-  const filteredRows = ids?.length
-    ? rows.filter((row) => ids.includes(row.rowIndex ?? row.id))
-    : rows;
-  return filteredRows?.map(mapRow);
+  const allRows = await Promise.all(baseIds.map(async (baseId, index) => {
+    const base = new Airtable({ apiKey: AIRTABLE_API_KEY }).base(baseId);
+    const table = viewIds[index];
+    const rows: any[] = [];
+
+    await base(table)
+      // TODO: Pass fields from matchRequest to retieve, not all of them
+      // TODO: Pass view as param, or default view: 'Matcher', sort: [{ field: 'ID', direction: 'desc' }]
+      // TODO: Max records as param
+      .select({ view: 'Matcher', maxRecords: 1000 })
+      .eachPage(function page(fetchedRecords, fetchNextPage) {
+        rows.push(...fetchedRecords);
+        fetchNextPage();
+      });
+    const getRowUrl = (r: any) => `https://airtable.com/${baseId}/${table}/${r.id}`;
+
+    // TODO: Unify id / rowIndex props.
+    const filteredRows = ids?.length
+      ? rows.filter((row) => ids.includes(row.rowIndex ?? row.id))
+      : rows;
+
+    return filteredRows?.map(r => ({
+      ...mapRow(r),
+      sheetTitle: viewIds.length > 1 && !table.toString().startsWith("tbl") ? table : undefined,
+      rowUrl: table.toString().startsWith("tbl") ? getRowUrl(r) : undefined
+    }))
+  }));
+
+  return allRows.flat();
 };
 
 export const getAirtableRetrieveFuncs = {

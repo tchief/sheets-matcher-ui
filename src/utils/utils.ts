@@ -3,8 +3,8 @@ export type SnakeToCamelCase<S extends string> = S extends `${infer T}_${infer U
   : S;
 export type SnakeToCamelCaseNested<T> = T extends object
   ? {
-      [K in keyof T as SnakeToCamelCase<K & string>]: SnakeToCamelCaseNested<T[K]>;
-    }
+    [K in keyof T as SnakeToCamelCase<K & string>]: SnakeToCamelCaseNested<T[K]>;
+  }
   : T;
 
 export type CamelToSnakeCase<S extends string> = S extends `${infer T}${infer U}`
@@ -13,8 +13,8 @@ export type CamelToSnakeCase<S extends string> = S extends `${infer T}${infer U}
 
 export type CamelCaseToSnakeNested<T> = T extends object
   ? {
-      [K in keyof T as CamelToSnakeCase<K & string>]: CamelCaseToSnakeNested<T[K]>;
-    }
+    [K in keyof T as CamelToSnakeCase<K & string>]: CamelCaseToSnakeNested<T[K]>;
+  }
   : T;
 
 export const slugify = (text: string) =>
@@ -26,3 +26,6 @@ export const slugify = (text: string) =>
     .replace(/\-\-+/g, '-')
     .replace(/^-+/, '')
     .replace(/-+$/, '');
+
+// @ts-ignore
+export const toTitle = (s: string) => s?.split('-').reduce((a, b) => a + b.charAt(0).toUpperCase() + b.slice(1) + ' ', []);

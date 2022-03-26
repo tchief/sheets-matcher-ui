@@ -10,4 +10,5 @@ export const locationTranslations: { [key: string]: string[] } = {
   Netherlands: ['Нідерланди', 'Голландія', 'Нидерланды', 'Голландия'],
   UK: ['Англія', 'Великобританія', 'Англия', 'Великобритания'],
   Spain: ['Іспанія', 'Испания'],
+  USA: ['United States', 'США']
 };

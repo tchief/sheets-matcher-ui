@@ -26,10 +26,57 @@ const MatchComponent = ({
     });
     setIsLoading(false);
   };
+  const showUrls = request.showUrls;
+
   return (
     <tr key={match.requestId}>
-      <td>{match.requestId}</td>
-      <td>{match.proposalIds.join(', ')}</td>
+      {showUrls && (
+        <>
+          <td>
+            {match.requestUrl ? (
+              <a
+                className="underline hover:text-blue-500 mt-4"
+                href={`${match.requestUrl}`}
+                target="_blank"
+                rel="noreferrer noopener"
+              >
+                {match.requestId}
+              </a>
+            ) : (
+              match.requestId
+            )}
+          </td>
+          <td>
+            {match.proposalIds.map((id, index) =>
+              !!match.proposalUrls?.[index] ? (
+                <>
+                  <a
+                    key={id}
+                    className="underline hover:text-blue-500 mt-4"
+                    href={`${match.proposalUrls[index]}`}
+                    target="_blank"
+                    rel="noreferrer noopener"
+                  >
+                    {id}
+                  </a>
+                  {index !== match.proposalIds.length - 1 && ', '}
+                </>
+              ) : index === match.proposalIds.length - 1 ? (
+                id
+              ) : (
+                `${id}, `
+              )
+            )}
+          </td>
+        </>
+      )}
+      {!showUrls && (
+        <>
+          <td>{match.requestId}</td>
+          <td>{match.proposalIds.join(', ')}</td>
+        </>
+      )}
+
       {showConnect && (
         <td>
           <button disabled={isLoading} onClick={handleConnect}>
