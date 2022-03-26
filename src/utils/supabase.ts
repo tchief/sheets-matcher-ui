@@ -19,8 +19,8 @@ export const saveMatchRequest = async (matchRequest: MatchRequest) =>
     .from('match_requests')
     .insert(camelToSnake(matchRequest), { returning: 'minimal' });
 
-export const findCity = async (city: string) =>
-  await supabase.rpc('search_cities', { city });
+export const findCity = async (city: string, supa: SupabaseClient) =>
+  await supa.rpc('search_cities', { city });
 
 export const saveApplication = async (application: Application, supa: SupabaseClient) =>
   await supa.from('applications').insert(application, { returning: 'minimal' });
