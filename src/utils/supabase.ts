@@ -1,6 +1,6 @@
 import { camelToSnake, MatchRequest, MatchRequestSnake, snakeToCamel } from './../match/types';
 import { createClient } from '@supabase/supabase-js';
-import { supabaseClient } from '@supabase/supabase-auth-helpers/nextjs';
+import { Application } from '../types';
 
 export const supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_KEY!);
 
@@ -17,3 +17,9 @@ export const saveMatchRequest = async (matchRequest: MatchRequest) =>
   await supabase
     .from('match_requests')
     .insert(camelToSnake(matchRequest), { returning: 'minimal' });
+
+export const findCity = async (city: string) =>
+  await supabase.rpc('search_cities', { city });
+
+export const saveApplication = async (application: Application) =>
+  await supabase.from('applications').insert(application, { returning: 'minimal' });
