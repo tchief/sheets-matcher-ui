@@ -6,7 +6,7 @@ interface Props {
   title?: string;
 }
 
-const DEFAULT_TITLE = 'Match My Sheets';
+const DEFAULT_TITLE = process.env.NEXT_PUBLIC_DEFAULT_TITLE ?? 'Match My Sheets';
 export default function Layout({ children, title = DEFAULT_TITLE }: Props) {
   return (
     <div>

@@ -20,6 +20,7 @@ create table public.match_requests (
    source_type varchar,
    messenger varchar,
    is_private boolean,
+   show_urls boolean,
    
    created_at timestamp with time zone default now(),
    primary key (id),
