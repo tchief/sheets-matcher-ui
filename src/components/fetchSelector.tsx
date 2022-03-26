@@ -40,7 +40,7 @@ function FetchSelector<T extends Id>(props: FetchProps<T> & SelectorProps<T>) {
       cacheOptions
       defaultOptions
       value={props.selected}
-      onChange={(e: SingleValue<T>) => props.setSelected(e)}
+      onChange={(e: any) => props.setSelected(e)}
       placeholder={props.placeholder}
       className={props.classes}
       getOptionLabel={props.stringify}
