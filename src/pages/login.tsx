@@ -8,6 +8,7 @@ const Login = () => (
       view="magic_link"
       magicLink
       providers={['discord', 'github']}
+      // @ts-ignore
       supabaseClient={supabaseClient}
     />
   </div>
