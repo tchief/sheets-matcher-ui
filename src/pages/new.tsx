@@ -17,9 +17,9 @@ import UnionSelector from '../components/unionSelector';
 import ReCAPTCHA from 'react-google-recaptcha';
 import styles from '../styles/Home.module.css';
 import { toast } from 'react-toastify';
-import { withAuthRequired } from '@supabase/supabase-auth-helpers/nextjs';
+import { User, withAuthRequired } from '@supabase/supabase-auth-helpers/nextjs';
 
-const New = () => {
+const New = ({ user }: { user: User }) => {
   const [side, setSide] = useState<Side>('request');
   const [from, setFrom] = useState<City>();
   const [to, setTo] = useState<City>();
@@ -53,6 +53,7 @@ const New = () => {
       time,
       description,
       //recaptcha,
+      author: user.id,
     };
 
     console.log(application);

@@ -11,6 +11,7 @@ export interface Application {
     when: string;
     time: string;
     description: string;
+    author: string;
 }
 
 export interface City {

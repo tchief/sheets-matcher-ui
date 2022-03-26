@@ -1,6 +1,7 @@
 import { camelToSnake, MatchRequest, MatchRequestSnake, snakeToCamel } from './../match/types';
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { createClient } from '@supabase/supabase-js';
 import { Application } from '../types';
+import { SupabaseClient } from '@supabase/supabase-auth-helpers/nextjs';
 
 export const supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_KEY!);
 
