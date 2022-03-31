@@ -29,3 +29,8 @@ export const slugify = (text: string) =>
 
 // @ts-ignore
 export const toTitle = (s: string) => s?.split('-').reduce((a, b) => a + b.charAt(0).toUpperCase() + b.slice(1) + ' ', []);
+
+// : { [key: string | number]: V[] }
+export const groupByDistinct = <T, V>(xs: T[], f: (t: T) => string | number, p: (t: T) => V) =>
+  // @ts-ignore
+  xs.reduce((r, v, i, a, k = f(v)) => ((r[k] || (r[k] = new Set())).add(p(v)), r), {});
