@@ -6,6 +6,7 @@ import styles from '../styles/Home.module.css';
 import MatchesTable from '../components/matches';
 import MatchesConfigComponent from '../components/config';
 import { useUser } from '@supabase/supabase-auth-helpers/react';
+import { supabaseClient } from '@supabase/supabase-auth-helpers/nextjs';
 import Layout from '../components/layout';
 
 const Room: NextPage = () => {
@@ -41,25 +42,27 @@ const Room: NextPage = () => {
             setMatchRequest={setMatchRequest}
           />
         }
-        <MatchesTable
-          matches={matches}
-          matchRequest={matchRequest}
-          showConnect={!!showConnect && !!user}
-        />
-        {/* {user && (
-        <>
-          <button onClick={() => supabaseClient.auth.signOut()}>Sign out</button>
-          <p>{user?.email}</p>
-        </>
-      )} */}
-        <a
-          className="underline hover:text-blue-500 mt-4"
-          href={`${process.env.NEXT_PUBLIC_SUPPORT_URL}`}
-          target="_blank"
-          rel="noreferrer noopener"
-        >
-          Support
-        </a>
+        <MatchesTable matches={matches} matchRequest={matchRequest} showConnect={!!showConnect && !!user} />
+
+        <div className="flex flex-row mt-4">
+          {user && <button onClick={() => supabaseClient.auth.signOut()}>Logout</button>}
+          {!user && (
+            <a className="underline hover:text-blue-500 mr-4" href="/login">
+              Login
+            </a>
+          )}
+          <a
+            className="underline hover:text-blue-500 mr-4"
+            href={`${process.env.NEXT_PUBLIC_SUPPORT_URL}`}
+            target="_blank"
+            rel="noreferrer noopener"
+          >
+            Support
+          </a>
+          <a className="underline hover:text-blue-500" href="/examples">
+            Examples
+          </a>
+        </div>
       </div>
     </Layout>
   );
