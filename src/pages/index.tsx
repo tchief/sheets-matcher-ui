@@ -8,6 +8,7 @@ import MatchesConfigComponent from '../components/config';
 import { useUser } from '@supabase/supabase-auth-helpers/react';
 import { supabaseClient } from '@supabase/supabase-auth-helpers/nextjs';
 import Layout from '../components/layout';
+import Link from 'next/link';
 
 const Room: NextPage = () => {
   const { user } = useUser();
@@ -47,9 +48,9 @@ const Room: NextPage = () => {
         <div className="flex flex-row mt-4">
           {user && <button onClick={() => supabaseClient.auth.signOut()}>Logout</button>}
           {!user && (
-            <a className="underline hover:text-blue-500 mr-4" href="/login">
-              Login
-            </a>
+            <Link href="/login">
+              <a className="underline hover:text-blue-500 mr-4">Login</a>
+            </Link>
           )}
           <a
             className="underline hover:text-blue-500 mr-4"
@@ -59,9 +60,9 @@ const Room: NextPage = () => {
           >
             Support
           </a>
-          <a className="underline hover:text-blue-500" href="/examples">
-            Examples
-          </a>
+          <Link href="/examples">
+            <a className="underline hover:text-blue-500">Examples</a>
+          </Link>
         </div>
       </div>
     </Layout>
