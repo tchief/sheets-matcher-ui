@@ -46,7 +46,7 @@ const Room: NextPage = () => {
         <MatchesTable matches={matches} matchRequest={matchRequest} showConnect={!!showConnect && !!user} />
 
         <div className="flex flex-row mt-4">
-          {user && <button onClick={() => supabaseClient.auth.signOut()}>Logout</button>}
+          {user && <button className="underline mr-4" onClick={() => supabaseClient.auth.signOut()}>Logout</button>}
           {!user && (
             <Link href="/login">
               <a className="underline hover:text-blue-500 mr-4">Login</a>
